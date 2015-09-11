@@ -10,6 +10,9 @@ use League\OAuth2\Server\Event;
 use League\OAuth2\Server\Exception;
 use League\OAuth2\Server\Util\SecureKey;
 use League\OAuth2\Server\Grant\PasswordGrant;
+use Illuminate\Support\Facades\Config;
+use Facebook\Facebook;
+use Larapack\FacebookGrant\Exceptions\InvalidConfigurationException;
 
 class FacebookGrant extends PasswordGrant
 {
@@ -59,8 +62,14 @@ class FacebookGrant extends PasswordGrant
             throw new Exception\InvalidRequestException('token');
         }
 
-        // Check if user's token are correct;
-        $userId = call_user_func($this->getVerifyCredentialsCallback(), $token);
+        // Get facebook user if enabled
+        $facebookUser = null;
+        if ($this->getGatherFacebookUser()) {
+            $facebookUser = $this->gatherFacebookUser($token);
+        }
+
+        // Check if credentials are correct;
+        $userId = call_user_func($this->getVerifyCredentialsCallback(), $token, $facebookUser);
 
         if ($userId === false) {
             $this->server->getEventEmitter()->emit(new Event\UserAuthenticationFailedEvent($this->server->getRequest()));
@@ -113,5 +122,66 @@ class FacebookGrant extends PasswordGrant
         }
 
         return $this->server->getTokenType()->generateResponse();
+    }
+
+    /**
+     * Return the configuration for gather_facebook_user
+     *
+     * @return boolean
+     */
+    protected function getGatherFacebookUser()
+    {
+        return Config::get('oauth.grant_types.facebook.gather_facebook_user', false);
+    }
+
+    /**
+     * Return the configuration for gather_facebook_user
+     *
+     * @return boolean
+     * 
+     * @throws
+     */
+    protected function gatherFacebookUser($token)
+    {
+        $fb = new Facebook([
+			'app_id' => $this->getFacebookClientId(),
+			'app_secret' => $this->getFacebookClientSecret(),
+		]);
+		
+		$me = $fb->get('/me?fields=id', $token);
+		
+		return $me;
+    }
+
+    /**
+     * Return the configuration for services
+     *
+     * @return string
+     * 
+     * @throws
+     */
+    protected function getFacebookClientId()
+    {
+        $value = Config::get('oauth.grant_types.facebook.client_id', null);
+        
+        if ($value == null) throw new InvalidConfigurationException('[client_id] is not set.');
+        
+        return $value;
+    }
+
+    /**
+     * Return the configuration for services
+     *
+     * @return string
+     * 
+     * @throws
+     */
+    protected function getFacebookClientSecret()
+    {
+        $value = Config::get('oauth.grant_types.facebook.client_secret', null);
+        
+        if ($value == null) throw new InvalidConfigurationException('[client_secret] is not set.');
+        
+        return $value;
     }
 }
