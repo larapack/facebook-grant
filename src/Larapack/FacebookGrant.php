@@ -12,7 +12,7 @@ use League\OAuth2\Server\Util\SecureKey;
 use League\OAuth2\Server\Grant\PasswordGrant;
 use Illuminate\Support\Facades\Config;
 use Facebook\Facebook;
-use Larapack\FacebookGrant\Exceptions\InvalidConfigurationException;
+use InvalidArgumentException;
 
 class FacebookGrant extends PasswordGrant
 {
@@ -144,13 +144,13 @@ class FacebookGrant extends PasswordGrant
     protected function gatherFacebookUser($token)
     {
         $fb = new Facebook([
-			'app_id' => $this->getFacebookClientId(),
-			'app_secret' => $this->getFacebookClientSecret(),
-		]);
-		
-		$me = $fb->get('/me?fields=id', $token);
-		
-		return $me;
+		'app_id' => $this->getFacebookClientId(),
+		'app_secret' => $this->getFacebookClientSecret(),
+	]);
+	
+	$me = $fb->get('/me?fields=id', $token);
+	
+	return $me;
     }
 
     /**
@@ -164,7 +164,7 @@ class FacebookGrant extends PasswordGrant
     {
         $value = Config::get('oauth.grant_types.facebook.client_id', null);
         
-        if ($value == null) throw new InvalidConfigurationException('[client_id] is not set.');
+        if ($value == null) throw new InvalidArgumentException('[client_id] is not set.');
         
         return $value;
     }
@@ -180,7 +180,7 @@ class FacebookGrant extends PasswordGrant
     {
         $value = Config::get('oauth.grant_types.facebook.client_secret', null);
         
-        if ($value == null) throw new InvalidConfigurationException('[client_secret] is not set.');
+        if ($value == null) throw new InvalidArgumentException('[client_secret] is not set.');
         
         return $value;
     }
