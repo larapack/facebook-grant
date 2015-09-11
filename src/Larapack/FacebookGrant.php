@@ -64,8 +64,8 @@ class FacebookGrant extends PasswordGrant
 
         // Get facebook user if enabled
         $facebookUser = null;
-        if ($this->getGatherFacebookUser()) {
-            $facebookUser = $this->gatherFacebookUser($token);
+        if ($this->getGatherUser()) {
+            $facebookUser = $this->gatherUser($token);
         }
 
         // Check if credentials are correct
@@ -125,27 +125,27 @@ class FacebookGrant extends PasswordGrant
     }
 
     /**
-     * Return the configuration for gather_facebook_user
+     * Return the configuration for gather_user
      *
      * @return boolean
      */
-    protected function getGatherFacebookUser()
+    protected function getGatherUser()
     {
-        return Config::get('oauth.grant_types.facebook.gather_facebook_user', false);
+        return Config::get('oauth.grant_types.facebook.gather_user', false);
     }
 
     /**
-     * Return the configuration for gather_facebook_user
+     * Return the configuration for gather_user
      *
      * @return boolean
      * 
      * @throws
      */
-    protected function gatherFacebookUser($token)
+    protected function gatherUser($token)
     {
         $fb = new Facebook([
-		'app_id' => $this->getFacebookClientId(),
-		'app_secret' => $this->getFacebookClientSecret(),
+		'app_id' => $this->getClientId(),
+		'app_secret' => $this->getClientSecret(),
 	]);
 	
 	$me = $fb->get('/me?fields=id', $token);
@@ -154,13 +154,13 @@ class FacebookGrant extends PasswordGrant
     }
 
     /**
-     * Return the configuration for services
+     * Return the client_secret
      *
      * @return string
      * 
      * @throws
      */
-    protected function getFacebookClientId()
+    protected function getClientId()
     {
         $value = Config::get('oauth.grant_types.facebook.client_id', null);
         
@@ -170,13 +170,13 @@ class FacebookGrant extends PasswordGrant
     }
 
     /**
-     * Return the configuration for services
+     * Return the client_secret
      *
      * @return string
      * 
      * @throws
      */
-    protected function getFacebookClientSecret()
+    protected function getClientSecret()
     {
         $value = Config::get('oauth.grant_types.facebook.client_secret', null);
         
