@@ -13,7 +13,8 @@ To enable this grant add the following to the `config/oauth2.php` configuration 
     'facebook' => [
         'class' => '\Larapack\FacebookGrant',
         'callback' => '\App\PasswordVerifier@verifyFacebook',
-        'access_token_ttl' => 3600
+        'access_token_ttl' => 3600,
+        'get_facebook_user' => true, // wheter or not we should get the $facebookUser variable to the callback
     ]
 ]
 ```
@@ -24,11 +25,14 @@ use App\User;
 
 class PasswordGrantVerifier
 {
-  public function verifyFacebook($facebookToken)
+  // $facebookUser will be null if `get_facebook_user` is not set to true in configuration.
+  public function verifyFacebook($facebookToken, $facebookUser)
   {
-      // possible get the user_id from facebook using their API and this token
+      $credentials = [
+        'facebook_user_id' => $facebookUser->getId(),
+      ];
 
-      if ($user = User::where('facebook_token', $facebookToken)->first()) {
+      if (Auth::once($credentials)) {
           return $user->id;
       }
 
