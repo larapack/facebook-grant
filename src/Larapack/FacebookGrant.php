@@ -59,7 +59,7 @@ class FacebookGrant extends PasswordGrant
             throw new Exception\InvalidRequestException('token');
         }
 
-        // Check if user's username and password are correct
+        // Check if user's token are correct;
         $userId = call_user_func($this->getVerifyCredentialsCallback(), $token);
 
         if ($userId === false) {
