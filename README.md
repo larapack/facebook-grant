@@ -24,9 +24,11 @@ use App\User;
 
 class PasswordGrantVerifier
 {
-  public function verifyFacebook($facebookUserId)
+  public function verifyFacebook($facebookToken)
   {
-      if ($user = User::where('facebook_user_id', $facebookUserId)->first()) {
+      // possible get the user_id from facebook using their API and this token
+
+      if ($user = User::where('facebook_token', $facebookToken)->first()) {
           return $user->id;
       }
 
