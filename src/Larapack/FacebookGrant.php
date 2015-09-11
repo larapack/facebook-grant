@@ -68,7 +68,7 @@ class FacebookGrant extends PasswordGrant
             $facebookUser = $this->gatherFacebookUser($token);
         }
 
-        // Check if credentials are correct;
+        // Check if credentials are correct
         $userId = call_user_func($this->getVerifyCredentialsCallback(), $token, $facebookUser);
 
         if ($userId === false) {
